@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import net.md_5.bungee.api.ChatColor;
 
-public final class World_of_nations extends JavaPlugin {
+public final class WorldOfNations extends JavaPlugin {
     public static String consolePrefix = ChatColor.GRAY + "[" + ChatColor.GOLD + "WoN" + ChatColor.GRAY + "]" + ChatColor.WHITE;
 
     @Override
