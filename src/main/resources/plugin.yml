@@ -2,3 +2,8 @@ name: world-of-nations
 version: '${project.version}'
 main: com.bambam250.worldofnations.WorldOfNations
 api-version: '1.20'
+commands:
+  nation:
+    aliases: [n]
+    description: Base command for all nation operations
+    usage: debug - command failed

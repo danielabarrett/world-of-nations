@@ -1,38 +1,50 @@
 package com.bambam250.worldofnations;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bambam250.worldofnations.commands.CmdNation;
 import com.bambam250.worldofnations.database.Database;
 import com.bambam250.worldofnations.listeners.PlayerJoin;
-
-import net.md_5.bungee.api.ChatColor;
+import com.bambam250.worldofnations.objects.City;
+import com.bambam250.worldofnations.objects.Nation;
 
 public final class WorldOfNations extends JavaPlugin {
-    public static String consolePrefix = ChatColor.GRAY + "[" + ChatColor.GOLD + "WoN" + ChatColor.GRAY + "] " + ChatColor.WHITE;
-    // public static SQL sql = new SQL();
+    
     public Database db;
+    public ArrayList<Nation> nations;
+    public ArrayList<City> cities;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-        Bukkit.getConsoleSender().sendMessage(consolePrefix + "Starting Plugin");
+        Bukkit.getConsoleSender().sendMessage(Util.consolePrefix + "Starting Plugin");
+
+        // Event listeners
         getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
 
+        // Command executors
+        this.getCommand("nation").setExecutor(new CmdNation(this));
+
+        // Database setup
         try {
             if (!getDataFolder().exists()) {
                 getDataFolder().mkdirs();
             }
 
-            db = new Database(getDataFolder().getAbsolutePath()+ "/nations.db");
+            db = new Database(getDataFolder().getAbsolutePath()+ "/nations.db", this);
         } catch (SQLException ex) {
             ex.printStackTrace();
             System.out.println("Failed to connect to the database! " + ex.getMessage());
             Bukkit.getPluginManager().disablePlugin(this);
         }
-        
+
+        // Nation and city initialization
+        nations = db.getAllNations();
+        // cities = db.getAllCities();
         
     }
 
@@ -46,6 +58,11 @@ public final class WorldOfNations extends JavaPlugin {
             ex.printStackTrace();
         }
 
-        Bukkit.getConsoleSender().sendMessage(consolePrefix + "Stopping Plugin");
+        Bukkit.getConsoleSender().sendMessage(Util.consolePrefix + "Stopping Plugin");
+    }
+
+    public void updateData() {
+        nations = db.getAllNations();
+        // cities = db.getAllCities();
     }
 }

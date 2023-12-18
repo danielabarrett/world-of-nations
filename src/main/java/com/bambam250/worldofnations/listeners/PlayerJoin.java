@@ -16,7 +16,7 @@ public class PlayerJoin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent ev) {
         Bukkit.getConsoleSender().sendMessage("Player joined; adding to register");
-        plugin.db.addPlayer(ev.getPlayer().getUniqueId(), ev.getPlayer().getName());
+        plugin.db.checkJoinedPlayer(ev.getPlayer().getUniqueId(), ev.getPlayer().getName());
     }
     
 }
