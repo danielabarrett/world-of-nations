@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 
 import com.bambam250.worldofnations.Util;
 import com.bambam250.worldofnations.WorldOfNations;
+import com.bambam250.worldofnations.objects.City;
 import com.bambam250.worldofnations.objects.Nation;
 
 import net.md_5.bungee.api.ChatColor;
@@ -35,7 +36,7 @@ public class Database {
                 CREATE TABLE IF NOT EXISTS nations (
                     uuid VARCHAR(127) PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
-                    flag VARCHAR(511),
+                    flag VARBINARY(65535),
                     capital VARCHAR(127),
                     owner VARCHAR(127)
                 )
@@ -153,6 +154,7 @@ public class Database {
         return "";
     }
 
+
     /**
      * Add nation to the database
      * @param nation Nation to be added
@@ -161,7 +163,7 @@ public class Database {
         try (Statement stmt = conn.createStatement()) {
             stmt.execute("""
                 INSERT INTO nations (uuid, name, flag, capital, owner) VALUES ('%s', '%s', '%s', '%s', '%s')  
-            """.formatted(nation.getUuid(), nation.getName(), nation.getFlagStr(), nation.getCapitalUuid(), nation.getOwner()));
+            """.formatted(nation.getUuid(), nation.getName(), nation.getFlagBytes(), nation.getCapitalUuid(), nation.getOwner()));
             plugin.updateData();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -180,11 +182,30 @@ public class Database {
                 SELECT * FROM nations WHERE uuid = '%s'
             """.formatted(uuid.toString()));
             rs.next();
-            return new Nation(uuid, rs.getString(2), rs.getString(3), Util.stou(rs.getString(4)), Util.stou(rs.getString(5)));
+            return new Nation(uuid, rs.getString(2), rs.getBytes(3), Util.stou(rs.getString(4)), Util.stou(rs.getString(5)));
         } catch (SQLException ex) {
+            printErr("Error loading nation " + uuid + ": " + ex.getMessage());
             ex.printStackTrace();
         }
-        printErr("Error constructing nation from database: " + ChatColor.GRAY + uuid);
+        return null;
+    }
+
+    /**
+     * Create a city object using the database
+     * @param uuid City uuid
+     * @return city matching uuid or null if there's an error
+     */
+    public City getCity(UUID uuid) {
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery("""
+                SELECT * FROM cities WHERE uuid = '%s'
+            """.formatted(uuid.toString()));
+            rs.next();
+            return new City(uuid, rs.getString(2), Util.stou(rs.getString(3)), Util.stou(rs.getString(4)));
+        } catch (SQLException ex) {
+            printErr("Error loading city " + uuid + ": " + ex.getMessage());
+            ex.printStackTrace();
+        }
         return null;
     }
 
@@ -194,17 +215,34 @@ public class Database {
      * Employs getNation function on all nations in the database
      * @return ArrayList of all nations in the database or null if there's an error
      */
-    public ArrayList<Nation> getAllNations() {
+    public ArrayList<Nation> loadNations() {
         try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery("""
                 SELECT uuid FROM NATIONS
             """);
             ArrayList<Nation> nlist = new ArrayList<>();
             while (rs.next()) {
-                nlist.add(getNation(UUID.fromString(rs.getString(1))));
+                nlist.add(getNation(Util.stou(rs.getString(1))));
             }
             return nlist;
         } catch (SQLException ex) {
+            printErr("Error loading nations: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public ArrayList<City> loadCities() {
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery("""
+                SELECT uuid FROM cities
+            """);
+            ArrayList<City> cList = new ArrayList<>();
+            while (rs.next()) {
+                cList.add(getCity(Util.stou(rs.getString(1))));
+            }
+        } catch (SQLException ex) {
+            printErr("Error loading cities: " + ex.getMessage());
             ex.printStackTrace();
         }
         return null;

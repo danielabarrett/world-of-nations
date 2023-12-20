@@ -7,3 +7,7 @@ commands:
     aliases: [n]
     description: Base command for all nation operations
     usage: debug - command failed
+  city:
+    aliases: [c]
+    description: Base command for all city operations
+    usage: debug - command failed

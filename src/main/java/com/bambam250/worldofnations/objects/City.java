@@ -7,7 +7,7 @@ public class City {
     String name;
     Nation nation;
     
-    public City() {
+    public City(UUID uuid, String name, UUID nation, UUID owner) {
 
     }
 

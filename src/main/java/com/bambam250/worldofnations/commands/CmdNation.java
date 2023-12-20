@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.bambam250.worldofnations.Util;
 import com.bambam250.worldofnations.WorldOfNations;
+import com.bambam250.worldofnations.guis.NationInfo;
 import com.bambam250.worldofnations.objects.Nation;
 
 public class CmdNation implements CommandExecutor {
@@ -27,6 +28,8 @@ public class CmdNation implements CommandExecutor {
                 return cmdCreate(sender, args);
             case "info":
                 return cmdInfo(sender, args);
+            case "list":
+                return cmdList(sender, args);
             default:
                 return false;
         }
@@ -44,8 +47,20 @@ public class CmdNation implements CommandExecutor {
     }
 
     public boolean cmdInfo(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) return false;
+        if (args.length == 2) {
+            Nation nation = plugin.nations.getNation(args[1]);
+            if (nation == null) return false;
+            Player player = (Player) sender;
+            player.openInventory(NationInfo.openNationInfo(nation, player));
+            return true;
+        }
+        return false;
+    }
+
+    public boolean cmdList(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            for (Nation n : plugin.nations) {
+            for (Nation n : plugin.nations.getNations()) {
                 sender.sendMessage(n.getName() + ", owner=" + Bukkit.getOfflinePlayer(n.getOwner()));
             }
         } else if (args.length == 2) {

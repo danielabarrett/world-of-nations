@@ -1,6 +1,6 @@
 package com.bambam250.worldofnations.config;
 
-public enum NationOptions {
+public enum NationOption {
     ALLOWDUALCITIZENSHIP (boolean.class, "Allow dual citizenship", "Determines if a player should be allowed to join this nation if they are already in another"),
     INVITEONLY (boolean.class, "Invite only", "Determines if a player should be able to join without an invite");
 
@@ -8,7 +8,7 @@ public enum NationOptions {
     private final String title;
     private final String description;
 
-    NationOptions(Class<?> configType, String title, String description) {
+    NationOption(Class<?> configType, String title, String description) {
         this.configType = configType;
         this.title = title;
         this.description = description;

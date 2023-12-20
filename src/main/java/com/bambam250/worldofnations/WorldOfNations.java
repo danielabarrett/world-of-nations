@@ -6,16 +6,20 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bambam250.worldofnations.commands.CmdCity;
 import com.bambam250.worldofnations.commands.CmdNation;
+import com.bambam250.worldofnations.commands.TabCompleteCity;
+import com.bambam250.worldofnations.commands.TabCompleteNation;
 import com.bambam250.worldofnations.database.Database;
 import com.bambam250.worldofnations.listeners.PlayerJoin;
 import com.bambam250.worldofnations.objects.City;
 import com.bambam250.worldofnations.objects.Nation;
+import com.bambam250.worldofnations.objects.NationList;
 
 public final class WorldOfNations extends JavaPlugin {
     
     public Database db;
-    public ArrayList<Nation> nations;
+    public NationList nations;
     public ArrayList<City> cities;
 
     @Override
@@ -28,6 +32,9 @@ public final class WorldOfNations extends JavaPlugin {
 
         // Command executors
         this.getCommand("nation").setExecutor(new CmdNation(this));
+        this.getCommand("city").setExecutor(new CmdCity(this));
+        this.getCommand("nation").setTabCompleter(new TabCompleteNation());
+        this.getCommand("city").setTabCompleter(new TabCompleteCity());
 
         // Database setup
         try {
@@ -43,8 +50,8 @@ public final class WorldOfNations extends JavaPlugin {
         }
 
         // Nation and city initialization
-        nations = db.getAllNations();
-        // cities = db.getAllCities();
+        nations = new NationList(db.loadNations());
+        cities = db.loadCities();
         
     }
 
@@ -62,7 +69,7 @@ public final class WorldOfNations extends JavaPlugin {
     }
 
     public void updateData() {
-        nations = db.getAllNations();
-        // cities = db.getAllCities();
+        nations = new NationList(db.loadNations());
+        cities = db.loadCities();
     }
 }

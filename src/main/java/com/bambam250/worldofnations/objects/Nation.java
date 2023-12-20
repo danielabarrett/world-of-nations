@@ -6,12 +6,16 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.bambam250.worldofnations.config.NationOptionsContainer;
+
 public class Nation {
     UUID uuid;
     String name;
     ItemStack flag;
     City capital;
     UUID owner;
+
+    NationOptionsContainer options;
 
     ArrayList<City> cities;
     ArrayList<UUID> citizens;
@@ -22,19 +26,26 @@ public class Nation {
      * Nation constructor to be used by database class; initialize each parameter from data from the database
      * @param uuid Nation uuid
      * @param name Name string
-     * @param flagStr Formatted flag itemstack string
+     * @param flagBytes Formatted flag itemstack string
      * @param capital Capital City uuid
      * @param owner 
      */
-    public Nation(UUID uuid, String name, String flagStr, UUID capital, UUID owner) {
+    public Nation(UUID uuid, String name, byte[] flagBytes, UUID capital, UUID owner) {
         this.uuid = uuid;
         this.name = name;
-        this.owner = owner;
+        deserializeFlag(flagBytes);
         // this.capital
-        this.flag = parseFlagStr(flagStr);
+        this.owner = owner;
+        
         // this.cities
     }
 
+
+    /**
+     * Nation constructor to be used when creating a new nation
+     * @param name New nation name
+     * @param owner New nation owner
+     */
     public Nation(String name, UUID owner) {
         this.uuid = UUID.randomUUID();
         this.name = name;
@@ -45,14 +56,41 @@ public class Nation {
 
 
     /**
-     * Parse a string into a banner itemstack
-     * @param flagStr Formatted flag itemstack string
+     * Deserialize a string into a banner itemstack. Stores result in 'flag' object field
+     * @param flagBytes Formatted flag itemstack byte array
+     */
+    public void deserializeFlag(byte[] flagBytes) {
+        // String[] args = flagStr.split(";");
+        // String[] patterns = args[2].split(",");
+        // // Material
+        // ItemStack flag = new ItemStack(Material.getMaterial(args[1]));
+        // BannerMeta flagMeta = (BannerMeta) flag.getItemMeta();
+        // flag.set
+        // // Patterns
+        // for (String pat : patterns) {
+        //     String[] patsplit = pat.split("|");
+        //     Pattern p = new Pattern(DyeColor.valueOf(patsplit[0]), PatternType.valueOf(patsplit[1]));
+        //     flagMeta.addPattern(p);
+        // }
+        flag = ItemStack.deserializeBytes(flagBytes);
+
+    }
+
+    /**
+     * Serialize the nation's flag into a byte array
+     * <br><br>
+    //  * Format: "<material>;<color1>|<pattern1>,<color2>|<pattern2>,...,<colorN>|<patternN>"
+     * @param flagBytes Formatted flag itemstack string
      * @return Banner itemstack
      */
-    public ItemStack parseFlagStr(String flagStr) {
+    public byte[] serializeFlag() {
+        // String output = "";
+        // output += flag.getType().toString() + ";";
         
         
-        return null;
+        // return output;
+        byte[] serial = flag.serializeAsBytes();
+        return serial;
     }
 
 
@@ -85,12 +123,12 @@ public class Nation {
         this.flag = flag;
     }
 
-    public String getFlagStr() {
-        return flag.toString();
+    public byte[] getFlagBytes() {
+        return serializeFlag();
     }
 
-    public void setFlagStr(String flagStr) {
-        this.flag = parseFlagStr(flagStr);
+    public void setFlag(byte[] flagBytes) {
+        deserializeFlag(flagBytes);
     }
 
 
